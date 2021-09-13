@@ -12,7 +12,7 @@ const generateAccessToken = (user) =>
   jwt.sign(
     { id: user.id, isAdmin: user.isAdmin },
     process.env.JWT_ACCESS_SECRET_KEY,
-    { expiresIn: "30m" }
+    { expiresIn: "10m" }
   );
 
 const generateRefreshToken = (user) =>

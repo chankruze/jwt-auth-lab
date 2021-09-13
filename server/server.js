@@ -9,11 +9,13 @@ if (isDevEnv()) {
   require("dotenv").config();
 }
 
-const express = require("express");
+const express = require("express"),
+  cors = require("cors");
 
 const PORT = process.env.PORT || 8888;
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 const users = [
@@ -77,7 +79,16 @@ app.post("/api/refresh", (req, res) => {
 // POST (login)
 app.post("/api/login", (req, res) => {
   const { username, password } = req.body;
-
+  console.table([
+    {
+      method: "POST",
+      endpoint: "/api/login",
+      hostname: req.hostname,
+      ip: req.ip,
+      username,
+      password,
+    },
+  ]);
   // find user in db & check pass
   const user = users.find(
     (u) => u.username === username && u.password === password
@@ -90,6 +101,8 @@ app.post("/api/login", (req, res) => {
     const refreshToken = generateRefreshToken(user);
     refreshTokens.push(refreshToken);
 
+    console.log({ status: "authorized" });
+
     // send token
     res.json({
       username: user.username,
@@ -98,7 +111,8 @@ app.post("/api/login", (req, res) => {
       refreshToken,
     });
   } else {
-    res.status(400).json("Username or pass inscorrect!");
+    console.log({ status: "unauthorized" });
+    res.status(401).send("Username or pass inscorrect!");
   }
 });
 
